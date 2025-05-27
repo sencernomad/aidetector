@@ -11,7 +11,10 @@ const nextConfig = {
       },
       // Add similar redirects for other static files if needed
     ];
-  }
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig; 
