@@ -205,17 +205,17 @@ export default function Home() {
                 98% accuracy in seconds. <span className="font-bold text-gray-900">No more guessing what's real.</span>
               </p>
               
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-16">
                 <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-fuchsia-600 via-purple-500 to-indigo-500 text-white shadow-xl text-2xl font-extrabold px-10 py-5 rounded-full border-4 border-white hover:scale-105 hover:shadow-2xl transition-all duration-200 animate-pulse"
+                  size="lg"
+                  className="w-full sm:w-auto text-xl py-6 px-14 rounded-lg font-bold"
                   onClick={handleUploadClick}
                 >
                   Analyze My Image
                 </Button>
               </div>
             </div>
-            <div className="relative flex flex-col items-center">
+            <div className="relative flex flex-col items-center min-h-[400px] max-h-[400px] w-[600px] justify-center">
               {/* Dikkat çekici AI/REAL badge */}
               {showResult && (
                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
@@ -230,13 +230,13 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div className="relative overflow-hidden rounded-xl shadow-2xl">
+              <div className="relative overflow-hidden rounded-xl shadow-2xl w-full h-full min-h-[400px] max-h-[400px]">
                 <Image 
                   src={images[currentImageIndex].src}
                   alt="AI Detection in action"
                   width={600} 
                   height={400}
-                  className="w-full object-cover aspect-[4/3]"
+                  className="w-full h-full object-cover aspect-[3/2]"
                   priority
                 />
                 {/* Overlay kaldırıldı, badge ve analiz süresi dışarıda */}
@@ -502,25 +502,55 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            <div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+            {/* Feature 1 */}
+            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
               <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
               <span className="font-medium">Instant AI Detection</span>
+              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                  Upload and get results in seconds with our real-time AI engine.
+                </div>
+              </div>
             </div>
-            <div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+            {/* Feature 2 */}
+            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
               <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
               <span className="font-medium">98% Accuracy Rate</span>
+              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                  Industry-leading accuracy, verified on millions of images.
+                </div>
+              </div>
             </div>
-            <div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+            {/* Feature 3 */}
+            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
               <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
               <span className="font-medium">Deepfake Recognition</span>
+              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                  Detects even the most sophisticated deepfake manipulations.
+                </div>
+              </div>
             </div>
-            <div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+            {/* Feature 4 */}
+            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
               <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
               <span className="font-medium">Batch Processing</span>
+              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                  Analyze multiple images at once for maximum efficiency.
+                </div>
+              </div>
             </div>
-            <div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+            {/* Feature 5 */}
+            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
               <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
               <span className="font-medium">Detailed Analysis Reports</span>
+              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                  Get comprehensive reports with confidence scores and detected markers.
+                </div>
+              </div>
             </div>
           </div>
 
