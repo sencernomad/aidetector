@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithPassword: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
   session: Session | null;
@@ -94,16 +96,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const signIn = async () => {
+  const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      const { error } = await signInWithGoogle();
-      if (error) {
-        console.error('Error in signIn:', error);
-        throw error;
-      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
     } catch (error) {
-      console.error('Exception in signIn:', error);
+      console.error('Error signing in with Google:', error);
+      // You might want to show a notification to the user
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithPassword = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      // On successful sign-in, onAuthStateChange will trigger and handle the session
+    } catch (error) {
+      console.error('Error signing in with password:', error);
+      throw error; // Re-throw to be caught in the UI
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUp = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        }
+      });
+      if (error) throw error;
+      // On successful sign-up, onAuthStateChange will trigger if email confirmation is off.
+      // If email confirmation is on, the user will be in a pending state.
+      // You might want to show a "Check your email" message here.
+    } catch (error) {
+      console.error('Error signing up:', error);
+      throw error; // Re-throw to be caught in the UI
     } finally {
       setLoading(false);
     }
@@ -112,16 +153,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     setLoading(true);
     try {
-      const { error } = await supabaseSignOut();
-      if (error) {
-        console.error('Error in signOut:', error);
-        throw error;
-      }
-      
-      // Redirect to home page after sign out
-      router.push('/');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      router.push('/'); // Redirect to home page after sign out
     } catch (error) {
-      console.error('Exception in signOut:', error);
+      console.error('Error signing out:', error);
     } finally {
       setLoading(false);
     }
@@ -131,7 +167,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     user,
     session,
     loading,
-    signIn,
+    signInWithGoogle,
+    signInWithPassword,
+    signUp,
     signOut,
     isAuthenticated
   };

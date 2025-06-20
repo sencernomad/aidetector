@@ -13,16 +13,10 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Home() {
   const t = useTranslations();
   const router = useRouter();
-  const { user, isAuthenticated, signIn, signOut } = useAuth();
-  
-  // Debug: Check if Supabase environment variables are set
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const isSupabaseConfigured = !!supabaseUrl && !!supabaseKey;
+  const { user, isAuthenticated, signOut } = useAuth();
   
   // Değişen görsel ve sonuçlar için state
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showResult, setShowResult] = useState(false);
   
   // Görseller ve sonuçlar
   const images = [
@@ -49,14 +43,6 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-      setShowResult(true);
-      
-      // Sonucu 1.5 saniye göster, sonra gizle
-      const hideTimeout = setTimeout(() => {
-        setShowResult(false);
-      }, 1500);
-      
-      return () => clearTimeout(hideTimeout);
     }, 2000);
     
     return () => clearInterval(interval);
@@ -180,609 +166,598 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Debug Info - Only visible in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-          <p className="font-bold">Debug Info</p>
-          <p>Supabase Configuration: {isSupabaseConfigured ? 'OK' : 'Missing'}</p>
-          {!isSupabaseConfigured && (
-            <p className="text-sm mt-2">
-              Please create a .env.local file with NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Hero Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl font-bold tracking-tight text-gray-900 mb-4">
-                Spot AI-Generated Images Instantly
-              </h1>
-              <p className="text-[1.375rem] md:text-2xl text-gray-800 mb-8 leading-snug">
-                98% accuracy in seconds. <span className="font-bold text-gray-900">No more guessing what's real.</span>
-              </p>
-              
-              <div className="flex justify-center mt-16">
-                <Button 
-                  size="lg"
-                  className="w-full sm:w-auto text-xl py-6 px-14 rounded-lg font-bold"
-                  onClick={handleUploadClick}
-                >
-                  Analyze My Image
-                </Button>
-              </div>
-            </div>
-            <div className="relative flex flex-col items-center min-h-[400px] max-h-[400px] w-[600px] justify-center">
-              {/* Dikkat çekici AI/REAL badge */}
-              {showResult && (
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
-                  <div className={`flex items-center gap-3 px-8 py-3 rounded-full shadow-xl text-white text-2xl font-extrabold tracking-wide animate-pulse ${images[currentImageIndex].result.includes('AI') ? 'bg-gradient-to-r from-fuchsia-600 to-purple-500' : 'bg-gradient-to-r from-green-500 to-emerald-400'}`}
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="py-12 md:py-20 px-4 bg-white">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
+                  Spot AI-Generated Images Instantly
+                </h1>
+                <p className="text-lg md:text-2xl text-gray-800 mb-8 leading-snug">
+                  98% accuracy in seconds. <span className="font-bold text-gray-900">No more guessing what's real.</span>
+                </p>
+                
+                <div className="flex justify-center md:justify-start mt-8 md:mt-16">
+                  <Button 
+                    size="lg"
+                    className="w-full sm:w-auto text-xl py-6 px-10 md:px-14 rounded-lg font-bold"
+                    onClick={handleUploadClick}
                   >
-                    <span className="drop-shadow-lg">
-                      {images[currentImageIndex].result.includes('AI') ? 'AI GENERATED' : 'REAL PHOTO'}
-                    </span>
-                    <span className="text-3xl font-black ml-2 drop-shadow-lg">
-                      {images[currentImageIndex].result}
-                    </span>
-                  </div>
+                    Analyze My Image
+                  </Button>
                 </div>
-              )}
-              <div className="relative overflow-hidden rounded-xl shadow-2xl w-full h-full min-h-[400px] max-h-[400px]">
-                <Image 
-                  src={images[currentImageIndex].src}
-                  alt="AI Detection in action"
-                  width={600} 
-                  height={400}
-                  className="w-full h-full object-cover aspect-[3/2]"
-                  priority
-                />
-                {/* Overlay kaldırıldı, badge ve analiz süresi dışarıda */}
               </div>
-              {/* Analiz süresi badge'i */}
-              {showResult && (
-                <div className="mt-6 flex justify-center w-full">
-                  <div className="bg-black text-white text-lg font-semibold px-6 py-2 rounded-full shadow-lg border-2 border-fuchsia-400 animate-fade-in">
-                    Analyzed in {analysisTime} seconds
+              <div className="relative flex flex-col items-center mt-8 md:mt-0">
+                {/* Sabit boyutlu container - image'lar değişse bile boyut aynı kalacak */}
+                <div className="relative w-full max-w-[600px] aspect-[3/2] flex flex-col items-center group">
+                  {/* Image container - sabit boyut */}
+                  <div className="relative overflow-hidden rounded-xl shadow-2xl w-full h-full">
+                    <Image 
+                      src={images[currentImageIndex].src}
+                      alt="AI Detection in action"
+                      layout="fill"
+                      objectFit="cover"
+                      className="w-full h-full"
+                      priority
+                    />
+                    
+                    {/* Hover overlay - AI/Real bilgisi */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-full shadow-xl text-white text-lg md:text-2xl font-extrabold tracking-wide bg-gray-900 border-2 border-gray-700">
+                        <span className="drop-shadow-lg text-center">
+                          {images[currentImageIndex].result.includes('AI') ? 'AI GENERATED' : 'REAL PHOTO'}
+                        </span>
+                        <span className="text-xl md:text-3xl font-black ml-1 md:ml-2 drop-shadow-lg">
+                          {images[currentImageIndex].result}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Analiz süresi badge'i - her zaman görünür ve süre değiştikçe animasyonlu */}
+                  <div key={analysisTime} className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in">
+                    <div className="bg-gray-900 text-white text-base md:text-lg font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg border-2 border-gray-700">
+                      Analyzed in {analysisTime} seconds
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Trusted By Section */}
-      <section className="py-16 px-4 bg-muted/20">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Trusted by Leading Organizations</h2>
-            <div className="h-1 w-32 bg-primary/40 mx-auto mb-6" />
+        {/* Trusted By Section */}
+        <section className="py-16 px-4 bg-muted/20">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-4">Trusted by Leading Organizations</h2>
+              <div className="h-1 w-32 bg-primary/40 mx-auto mb-6" />
+            </div>
+            
+            <div className="relative overflow-hidden mb-12">
+              <div className="flex animate-marquee">
+                <div className="logo-container">
+                  <Image 
+                    src="/adobe-logo.svg" 
+                    alt="Adobe" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/getty-images-1-logo-black-and-white.png" 
+                    alt="Getty Images" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/openai-logo-black-and-white.png" 
+                    alt="OpenAI" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/reuters-logo-black-transparent.png" 
+                    alt="Reuters" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/nvidia-logo.png" 
+                    alt="NVIDIA" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/Canva-Logo.png" 
+                    alt="Canva" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/bogazici.png" 
+                    alt="Bogazici University" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/vestelventures.png" 
+                    alt="Vestel Ventures" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/Wikipedia-logo-v2-en.svg.png" 
+                    alt="Wikipedia" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/neohub.png" 
+                    alt="NeoHub" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/colendi.png" 
+                    alt="Colendi" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                
+                {/* Duplicate logos for continuous scrolling effect */}
+                <div className="logo-container">
+                  <Image 
+                    src="/adobe-logo.svg" 
+                    alt="Adobe" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/getty-images-1-logo-black-and-white.png" 
+                    alt="Getty Images" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/openai-logo-black-and-white.png" 
+                    alt="OpenAI" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/reuters-logo-black-transparent.png" 
+                    alt="Reuters" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/nvidia-logo.png" 
+                    alt="NVIDIA" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/Canva-Logo.png" 
+                    alt="Canva" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/bogazici.png" 
+                    alt="Bogazici University" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/vestelventures.png" 
+                    alt="Vestel Ventures" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/Wikipedia-logo-v2-en.svg.png" 
+                    alt="Wikipedia" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/neohub.png" 
+                    alt="NeoHub" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <div className="logo-container">
+                  <Image 
+                    src="/colendi.png" 
+                    alt="Colendi" 
+                    width={140} 
+                    height={50}
+                    className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center mt-12">
+              <div className="flex flex-wrap justify-center items-center gap-4">
+                <div 
+                  className={`text-3xl font-bold transition-all duration-300 ${
+                    isCounterAnimating ? 'text-green-500' : 'text-foreground'
+                  }`}
+                >
+                  {formatNumber(displayTotalUsers)}
+                </div>
+                <div className="text-lg text-muted-foreground">trusted by users</div>
+                <div className="w-2 h-2 rounded-full bg-muted-foreground"></div>
+                <div 
+                  className={`text-3xl font-bold transition-all duration-300 ${
+                    isCounterAnimating ? 'text-green-500' : 'text-foreground'
+                  }`}
+                >
+                  {formatNumber(displayWeeklyUsers)}
+                </div>
+                <div className="text-lg text-muted-foreground">new users this week</div>
+              </div>
+            </div>
           </div>
-          
-          <div className="relative overflow-hidden mb-12">
-            <div className="flex animate-marquee">
-              <div className="logo-container">
-                <Image 
-                  src="/adobe-logo.svg" 
-                  alt="Adobe" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-20 px-4">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold mb-4">Advanced AI Image Detection Features</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Stay Ahead of Deepfakes with the Latest Technology
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+              {/* Feature 1 */}
+              <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <span className="font-medium">Instant AI Detection</span>
+                <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                  <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                    Upload and get results in seconds with our real-time AI engine.
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/getty-images-1-logo-black-and-white.png" 
-                  alt="Getty Images" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              {/* Feature 2 */}
+              <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <span className="font-medium">98% Accuracy Rate</span>
+                <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                  <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                    Industry-leading accuracy, verified on millions of images.
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/openai-logo-black-and-white.png" 
-                  alt="OpenAI" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              {/* Feature 3 */}
+              <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <span className="font-medium">Deepfake Recognition</span>
+                <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                  <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                    Detects even the most sophisticated deepfake manipulations.
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/reuters-logo-black-transparent.png" 
-                  alt="Reuters" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              {/* Feature 4 */}
+              <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <span className="font-medium">Batch Processing</span>
+                <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                  <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                    Analyze multiple images at once for maximum efficiency.
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/nvidia-logo.png" 
-                  alt="NVIDIA" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              {/* Feature 5 */}
+              <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <span className="font-medium">Detailed Analysis Reports</span>
+                <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                  <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
+                    Get comprehensive reports with confidence scores and detected markers.
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/Canva-Logo.png" 
-                  alt="Canva" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+            </div>
+
+            <div className="space-y-24">
+              {/* Algorithm Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">State-of-the-Art Detection Algorithm</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Our proprietary AI technology can identify even the most sophisticated AI-generated images. 
+                    Simply upload any photo and get instant verification results that highlight artificial elements.
+                  </p>
+                </div>
+                <div className="bg-muted rounded-lg overflow-hidden shadow-lg">
+                  <div className="aspect-[16/9] relative">
+                    <Image
+                      src="/usecasekadın.png"
+                      alt="Woman using AI detection technology"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/bogazici.png" 
-                  alt="Bogazici University" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+
+              {/* Reports Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:flex-row-reverse">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">Comprehensive Analysis Reports</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Receive detailed reports showing confidence scores, detected manipulation markers, 
+                    and authenticity verification. Perfect for professionals needing documented evidence of image authenticity.
+                  </p>
+                </div>
+                <div className="bg-muted rounded-lg overflow-hidden shadow-lg">
+                  <div className="aspect-[16/9] relative">
+                    <Image
+                      src="/usecasekodlama.png"
+                      alt="Coding and analysis of AI image detection"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/vestelventures.png" 
-                  alt="Vestel Ventures" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/Wikipedia-logo-v2-en.svg.png" 
-                  alt="Wikipedia" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/neohub.png" 
-                  alt="NeoHub" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/colendi.png" 
-                  alt="Colendi" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4">
+          <div className="container mx-auto max-w-4xl text-center">
+            <h2 className="text-3xl font-bold mb-4">Ready to Detect AI-Generated Images?</h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Start using our advanced AI detection technology today
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="gap-2"
+                onClick={handleUploadClick}
+              >
+                Try It Now
+              </Button>
+              <Button size="lg" variant="outline" className="gap-2">
+                View Pricing
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section id="testimonials" className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-2">What Our Users Say</h2>
+            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+              Thousands of professionals trust our AI detection technology
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Testimonial 1 */}
+              <div className="bg-background p-6 rounded-lg shadow-sm border">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 mr-4 flex items-center justify-center">
+                    <span className="text-primary font-medium">S</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Sarah Johnson</h4>
+                    <p className="text-sm text-muted-foreground">Digital Content Creator</p>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "AI Scanner has become an essential tool in my workflow. I can quickly verify if stock photos I purchase are AI-generated or authentic. The accuracy is impressive!"
+                </p>
               </div>
               
-              {/* Duplicate logos for continuous scrolling effect */}
-              <div className="logo-container">
-                <Image 
-                  src="/adobe-logo.svg" 
-                  alt="Adobe" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              {/* Testimonial 2 */}
+              <div className="bg-background p-6 rounded-lg shadow-sm border">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 mr-4 flex items-center justify-center">
+                    <span className="text-primary font-medium">M</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Michael Chen</h4>
+                    <p className="text-sm text-muted-foreground">Graphic Designer</p>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "I need to ensure every image I present to clients is properly sourced. This tool helps me quickly identify suspicious images. It's simple to use and very reliable."
+                </p>
               </div>
-              <div className="logo-container">
-                <Image 
-                  src="/getty-images-1-logo-black-and-white.png" 
-                  alt="Getty Images" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/openai-logo-black-and-white.png" 
-                  alt="OpenAI" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/reuters-logo-black-transparent.png" 
-                  alt="Reuters" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/nvidia-logo.png" 
-                  alt="NVIDIA" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/Canva-Logo.png" 
-                  alt="Canva" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/bogazici.png" 
-                  alt="Bogazici University" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/vestelventures.png" 
-                  alt="Vestel Ventures" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/Wikipedia-logo-v2-en.svg.png" 
-                  alt="Wikipedia" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/neohub.png" 
-                  alt="NeoHub" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div className="logo-container">
-                <Image 
-                  src="/colendi.png" 
-                  alt="Colendi" 
-                  width={140} 
-                  height={50}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              
+              {/* Testimonial 3 */}
+              <div className="bg-background p-6 rounded-lg shadow-sm border">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 mr-4 flex items-center justify-center">
+                    <span className="text-primary font-medium">E</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Emily Rodriguez</h4>
+                    <p className="text-sm text-muted-foreground">Social Media Manager</p>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "The authenticity of images is crucial for our brand campaigns. AI Scanner has become an indispensable part of our content verification process."
+                </p>
               </div>
             </div>
           </div>
-          
-          <div className="text-center mt-12">
-            <div className="flex flex-wrap justify-center items-center gap-4">
-              <div 
-                className={`text-3xl font-bold transition-all duration-300 ${
-                  isCounterAnimating ? 'text-green-500' : 'text-foreground'
-                }`}
-              >
-                {formatNumber(displayTotalUsers)}
-              </div>
-              <div className="text-lg text-muted-foreground">trusted by users</div>
-              <div className="w-2 h-2 rounded-full bg-muted-foreground"></div>
-              <div 
-                className={`text-3xl font-bold transition-all duration-300 ${
-                  isCounterAnimating ? 'text-green-500' : 'text-foreground'
-                }`}
-              >
-                {formatNumber(displayWeeklyUsers)}
-              </div>
-              <div className="text-lg text-muted-foreground">new users this week</div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Advanced AI Image Detection Features</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Stay Ahead of Deepfakes with the Latest Technology
+        {/* FAQ Section */}
+        <section className="py-20" id="faq">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-3xl font-bold text-center mb-2">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground text-center mb-12">
+              Everything you need to know about our AI detection technology
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {/* Feature 1 */}
-            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
-              <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-              <span className="font-medium">Instant AI Detection</span>
-              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
-                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
-                  Upload and get results in seconds with our real-time AI engine.
-                </div>
+            
+            <div className="space-y-4">
+              {/* FAQ Item 1 */}
+              <div className="border rounded-lg overflow-hidden">
+                <button 
+                  className="flex justify-between items-center w-full p-4 text-left font-medium"
+                  onClick={() => toggleFaq(0)}
+                >
+                  <span>How accurate is the AI detection?</span>
+                  {openFaqIndex === 0 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
+                </button>
+                {openFaqIndex === 0 && (
+                  <div className="p-4 border-t">
+                    <p className="text-muted-foreground">
+                      Our AI detection technology achieves over 95% accuracy in identifying AI-generated images. The system is continuously trained on the latest AI-generated content to stay ahead of new generation techniques.
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
-            {/* Feature 2 */}
-            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
-              <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-              <span className="font-medium">98% Accuracy Rate</span>
-              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
-                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
-                  Industry-leading accuracy, verified on millions of images.
-                </div>
+              
+              {/* FAQ Item 2 */}
+              <div className="border rounded-lg overflow-hidden">
+                <button 
+                  className="flex justify-between items-center w-full p-4 text-left font-medium"
+                  onClick={() => toggleFaq(1)}
+                >
+                  <span>What types of images can be analyzed?</span>
+                  {openFaqIndex === 1 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
+                </button>
+                {openFaqIndex === 1 && (
+                  <div className="p-4 border-t">
+                    <p className="text-muted-foreground">
+                      Our system can analyze most common image formats including JPEG, PNG, WebP, and GIF. The tool works best with photographs and realistic images, but can also detect AI-generated illustrations and artwork.
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
-            {/* Feature 3 */}
-            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
-              <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-              <span className="font-medium">Deepfake Recognition</span>
-              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
-                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
-                  Detects even the most sophisticated deepfake manipulations.
-                </div>
+              
+              {/* FAQ Item 3 */}
+              <div className="border rounded-lg overflow-hidden">
+                <button 
+                  className="flex justify-between items-center w-full p-4 text-left font-medium"
+                  onClick={() => toggleFaq(2)}
+                >
+                  <span>Is my data kept private?</span>
+                  {openFaqIndex === 2 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
+                </button>
+                {openFaqIndex === 2 && (
+                  <div className="p-4 border-t">
+                    <p className="text-muted-foreground">
+                      Yes, we take privacy seriously. Uploaded images are processed securely and are not stored on our servers after analysis. We do not use your images for training our models or share them with third parties.
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
-            {/* Feature 4 */}
-            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
-              <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-              <span className="font-medium">Batch Processing</span>
-              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
-                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
-                  Analyze multiple images at once for maximum efficiency.
-                </div>
+              
+              {/* FAQ Item 4 */}
+              <div className="border rounded-lg overflow-hidden">
+                <button 
+                  className="flex justify-between items-center w-full p-4 text-left font-medium"
+                  onClick={() => toggleFaq(3)}
+                >
+                  <span>How does the technology work?</span>
+                  {openFaqIndex === 3 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
+                </button>
+                {openFaqIndex === 3 && (
+                  <div className="p-4 border-t">
+                    <p className="text-muted-foreground">
+                      Our system uses advanced machine learning algorithms to analyze patterns in images that are characteristic of AI generation. It examines pixel-level details, consistency in lighting, textures, and other subtle markers that humans might miss.
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
-            {/* Feature 5 */}
-            <div className="group relative flex items-start gap-3 p-4 rounded-lg border bg-card transition-all duration-200 hover:bg-primary/5 hover:border-primary/60 shadow-sm cursor-pointer">
-              <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-              <span className="font-medium">Detailed Analysis Reports</span>
-              <div className="absolute left-0 top-full mt-2 w-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 pointer-events-none transition-all duration-200 z-10">
-                <div className="bg-white border border-primary/30 rounded-lg shadow-lg p-3 text-sm text-gray-700 animate-fade-in">
-                  Get comprehensive reports with confidence scores and detected markers.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-24">
-            {/* Algorithm Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h3 className="text-2xl font-bold mb-4">State-of-the-Art Detection Algorithm</h3>
-                <p className="text-muted-foreground mb-6">
-                  Our proprietary AI technology can identify even the most sophisticated AI-generated images. 
-                  Simply upload any photo and get instant verification results that highlight artificial elements.
-                </p>
-              </div>
-              <div className="bg-muted rounded-lg overflow-hidden shadow-lg">
-                <div className="aspect-[16/9] relative">
-                  <Image
-                    src="/usecasekadın.png"
-                    alt="Woman using AI detection technology"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Reports Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:flex-row-reverse">
-              <div>
-                <h3 className="text-2xl font-bold mb-4">Comprehensive Analysis Reports</h3>
-                <p className="text-muted-foreground mb-6">
-                  Receive detailed reports showing confidence scores, detected manipulation markers, 
-                  and authenticity verification. Perfect for professionals needing documented evidence of image authenticity.
-                </p>
-              </div>
-              <div className="bg-muted rounded-lg overflow-hidden shadow-lg">
-                <div className="aspect-[16/9] relative">
-                  <Image
-                    src="/usecasekodlama.png"
-                    alt="Coding and analysis of AI image detection"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+              
+              {/* FAQ Item 5 */}
+              <div className="border rounded-lg overflow-hidden">
+                <button 
+                  className="flex justify-between items-center w-full p-4 text-left font-medium"
+                  onClick={() => toggleFaq(4)}
+                >
+                  <span>Do you offer an API for developers?</span>
+                  {openFaqIndex === 4 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
+                </button>
+                {openFaqIndex === 4 && (
+                  <div className="p-4 border-t">
+                    <p className="text-muted-foreground">
+                      Yes, we offer a developer API for integrating our AI detection capabilities into your own applications. Check our pricing page for API plans and documentation.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Detect AI-Generated Images?</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Start using our advanced AI detection technology today
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="gap-2"
-              onClick={handleUploadClick}
-            >
-              Try It Now
-            </Button>
-            <Button size="lg" variant="outline" className="gap-2">
-              View Pricing
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-2">What Our Users Say</h2>
-          <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-            Thousands of professionals trust our AI detection technology
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
-            <div className="bg-background p-6 rounded-lg shadow-sm border">
-              <div className="flex items-center mb-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 mr-4 flex items-center justify-center">
-                  <span className="text-primary font-medium">S</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Sarah Johnson</h4>
-                  <p className="text-sm text-muted-foreground">Digital Content Creator</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground">
-                "AI Scanner has become an essential tool in my workflow. I can quickly verify if stock photos I purchase are AI-generated or authentic. The accuracy is impressive!"
-              </p>
-            </div>
-            
-            {/* Testimonial 2 */}
-            <div className="bg-background p-6 rounded-lg shadow-sm border">
-              <div className="flex items-center mb-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 mr-4 flex items-center justify-center">
-                  <span className="text-primary font-medium">M</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Michael Chen</h4>
-                  <p className="text-sm text-muted-foreground">Graphic Designer</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground">
-                "I need to ensure every image I present to clients is properly sourced. This tool helps me quickly identify suspicious images. It's simple to use and very reliable."
-              </p>
-            </div>
-            
-            {/* Testimonial 3 */}
-            <div className="bg-background p-6 rounded-lg shadow-sm border">
-              <div className="flex items-center mb-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 mr-4 flex items-center justify-center">
-                  <span className="text-primary font-medium">E</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Emily Rodriguez</h4>
-                  <p className="text-sm text-muted-foreground">Social Media Manager</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground">
-                "The authenticity of images is crucial for our brand campaigns. AI Scanner has become an indispensable part of our content verification process."
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-20" id="faq">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-3xl font-bold text-center mb-2">Frequently Asked Questions</h2>
-          <p className="text-muted-foreground text-center mb-12">
-            Everything you need to know about our AI detection technology
-          </p>
-          
-          <div className="space-y-4">
-            {/* FAQ Item 1 */}
-            <div className="border rounded-lg overflow-hidden">
-              <button 
-                className="flex justify-between items-center w-full p-4 text-left font-medium"
-                onClick={() => toggleFaq(0)}
-              >
-                <span>How accurate is the AI detection?</span>
-                {openFaqIndex === 0 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
-              </button>
-              {openFaqIndex === 0 && (
-                <div className="p-4 border-t">
-                  <p className="text-muted-foreground">
-                    Our AI detection technology achieves over 95% accuracy in identifying AI-generated images. The system is continuously trained on the latest AI-generated content to stay ahead of new generation techniques.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* FAQ Item 2 */}
-            <div className="border rounded-lg overflow-hidden">
-              <button 
-                className="flex justify-between items-center w-full p-4 text-left font-medium"
-                onClick={() => toggleFaq(1)}
-              >
-                <span>What types of images can be analyzed?</span>
-                {openFaqIndex === 1 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
-              </button>
-              {openFaqIndex === 1 && (
-                <div className="p-4 border-t">
-                  <p className="text-muted-foreground">
-                    Our system can analyze most common image formats including JPEG, PNG, WebP, and GIF. The tool works best with photographs and realistic images, but can also detect AI-generated illustrations and artwork.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* FAQ Item 3 */}
-            <div className="border rounded-lg overflow-hidden">
-              <button 
-                className="flex justify-between items-center w-full p-4 text-left font-medium"
-                onClick={() => toggleFaq(2)}
-              >
-                <span>Is my data kept private?</span>
-                {openFaqIndex === 2 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
-              </button>
-              {openFaqIndex === 2 && (
-                <div className="p-4 border-t">
-                  <p className="text-muted-foreground">
-                    Yes, we take privacy seriously. Uploaded images are processed securely and are not stored on our servers after analysis. We do not use your images for training our models or share them with third parties.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* FAQ Item 4 */}
-            <div className="border rounded-lg overflow-hidden">
-              <button 
-                className="flex justify-between items-center w-full p-4 text-left font-medium"
-                onClick={() => toggleFaq(3)}
-              >
-                <span>How does the technology work?</span>
-                {openFaqIndex === 3 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
-              </button>
-              {openFaqIndex === 3 && (
-                <div className="p-4 border-t">
-                  <p className="text-muted-foreground">
-                    Our system uses advanced machine learning algorithms to analyze patterns in images that are characteristic of AI generation. It examines pixel-level details, consistency in lighting, textures, and other subtle markers that humans might miss.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* FAQ Item 5 */}
-            <div className="border rounded-lg overflow-hidden">
-              <button 
-                className="flex justify-between items-center w-full p-4 text-left font-medium"
-                onClick={() => toggleFaq(4)}
-              >
-                <span>Do you offer an API for developers?</span>
-                {openFaqIndex === 4 ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
-              </button>
-              {openFaqIndex === 4 && (
-                <div className="p-4 border-t">
-                  <p className="text-muted-foreground">
-                    Yes, we offer a developer API for integrating our AI detection capabilities into your own applications. Check our pricing page for API plans and documentation.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-muted py-16">

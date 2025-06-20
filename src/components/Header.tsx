@@ -9,7 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header() {
   const t = useTranslations();
-  const { isAuthenticated, signIn, signOut } = useAuth();
+  const { isAuthenticated, signOut } = useAuth();
   const router = useRouter();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
@@ -29,7 +29,7 @@ export default function Header() {
   };
 
   return (
-    <header className="border-b sticky top-0 bg-background z-10">
+    <header className="border-b sticky top-0 bg-background z-50">
       <div className="container mx-auto py-4 px-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <Image 
@@ -57,7 +57,7 @@ export default function Header() {
               <Button size="sm" onClick={signOut}>{t.header.nav.logout}</Button>
             </>
           ) : (
-            <Button size="sm" onClick={signIn}>{t.header.nav.login}</Button>
+            <Button size="sm" onClick={() => router.push('/login')}>{t.header.nav.login}</Button>
           )}
         </div>
       </div>

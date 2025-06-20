@@ -90,11 +90,11 @@ export default function ProfilePage() {
             <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name || user.user_metadata.name || user.email} />
           ) : null}
           <AvatarFallback className="bg-gradient-to-br from-fuchsia-500 to-indigo-500 text-white text-3xl">
-            {user?.user_metadata?.full_name?.[0] || user?.user_metadata?.name?.[0] || user?.email?.[0] || 'U'}
+            {user?.user_metadata?.full_name?.[0] || user?.user_metadata?.name?.[0] || user?.email?.[0] || 'W'}
           </AvatarFallback>
         </Avatar>
         <h1 className="text-3xl font-bold mb-1">
-          {user?.user_metadata?.full_name || user?.user_metadata?.name || 'User'}
+          {user?.user_metadata?.full_name || user?.user_metadata?.name || 'Welcome!'}
         </h1>
         <p className="text-muted-foreground text-lg mb-4">{user?.email}</p>
         {/* Subscription Status */}
@@ -111,7 +111,7 @@ export default function ProfilePage() {
             ) : (
               <span className="flex items-center gap-1 bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold">
                 <ShieldCheck className="h-4 w-4 mr-1" /> Not Subscribed
-              </span>
+            </span>
             )}
             {subscriptionStatus === 'Not subscribed yet' && (
               <Button asChild size="sm" className="ml-2 bg-gradient-to-r from-fuchsia-600 to-indigo-500 text-white font-bold px-4 py-1 rounded-full shadow hover:scale-105 transition-all">

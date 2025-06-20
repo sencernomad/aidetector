@@ -317,10 +317,10 @@ export default function CreatePage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="bg-background rounded-full px-3 py-1 flex items-center gap-2 shadow-md">
-                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                      <span className="text-xs font-medium">
-                        Analyzed in {analysisTime || 0.8} seconds
-                      </span>
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs font-medium">
+                      Analyzed in {analysisTime || 0.8} seconds
+                    </span>
                     </div>
                     <div
                       className={`ml-2 flex items-center px-3 py-1 rounded-full shadow-md border font-bold text-xs tracking-wide
