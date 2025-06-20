@@ -28,6 +28,7 @@ interface ScanDetail {
   raw?: string;
 }
 
+// Force a re-commit to trigger a new build
 export default function ProfilePage() {
   const { user, loading, isAuthenticated, signOut } = useAuth();
   const router = useRouter();
