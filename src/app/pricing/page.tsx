@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(true);
-  const { isAuthenticated, signIn, signOut } = useAuth();
+  const { isAuthenticated, signOut } = useAuth();
   const router = useRouter();
   
   const plans = [
