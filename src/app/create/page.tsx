@@ -315,11 +315,27 @@ export default function CreatePage() {
                       Powered by advanced AI detection technology
                     </p>
                   </div>
-                  <div className="bg-background rounded-full px-3 py-1 flex items-center gap-2 shadow-md animate-pulse">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    <span className="text-xs font-medium">
-                      Analyzed in {analysisTime || 0.8} seconds
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-background rounded-full px-3 py-1 flex items-center gap-2 shadow-md">
+                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                      <span className="text-xs font-medium">
+                        Analyzed in {analysisTime || 0.8} seconds
+                      </span>
+                    </div>
+                    <div
+                      className={`ml-2 flex items-center px-3 py-1 rounded-full shadow-md border font-bold text-xs tracking-wide
+                        ${result.isAI
+                          ? 'bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white border-fuchsia-400'
+                          : 'bg-gradient-to-r from-green-400 to-emerald-500 text-white border-green-400'}
+                      `}
+                    >
+                      <span className="mr-1">
+                        {result.isAI ? 'AI GENERATED' : 'REAL PHOTO'}
+                      </span>
+                      <span className="ml-1">
+                        {result.confidence.toFixed(0)}% {result.isAI ? 'AI' : 'Real'}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 
@@ -329,18 +345,6 @@ export default function CreatePage() {
                       result.isAI ? "text-purple-500" : "text-green-500"
                     }`}>
                       {result.confidence.toFixed(0)}%
-                    </div>
-                    
-                    <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2">
-                      <div className={`h-16 w-16 rounded-full flex items-center justify-center border-4 ${
-                        result.isAI ? "border-purple-500 bg-purple-50" : "border-green-500 bg-green-50"
-                      }`}>
-                        <span className={`text-sm font-bold ${
-                          result.isAI ? "text-purple-700" : "text-green-700"
-                        }`}>
-                          {result.isAI ? "AI" : "REAL"}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
