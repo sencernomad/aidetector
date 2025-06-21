@@ -23,14 +23,14 @@ export default function PricingPage() {
         annualTotal: 59.99
       },
       features: [
-        "5 image scans per month",
+        isAnnual ? "300 image scans per year" : "20 image scans per month",
         "Basic AI detection",
         "95% accuracy",
         "Email support",
         "Mobile-friendly interface",
         "Detailed analysis reports"
       ],
-      cta: "Get Started",
+      cta: "Get Now!",
       popular: false
     },
     {
@@ -43,7 +43,7 @@ export default function PricingPage() {
       },
       features: [
         "Everything in Lite plan",
-        "Unlimited image scans",
+        isAnnual ? "1000 image scans per year" : "100 image scans per month",
         "99% accuracy",
         "24/7 priority support",
         "API access",
@@ -51,7 +51,7 @@ export default function PricingPage() {
         "Advanced analytics dashboard",
         "Custom integration options"
       ],
-      cta: "Start Free Trial",
+      cta: "Get Pro!",
       popular: true
     }
   ];
@@ -79,7 +79,7 @@ export default function PricingPage() {
             <div className="flex items-center justify-center mt-8">
               <div className="bg-muted p-1 rounded-full flex items-center">
                 <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium relative ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium relative transition-all hover:scale-105 ${
                     isAnnual ? "bg-background shadow-sm" : ""
                   }`}
                   onClick={() => setIsAnnual(true)}
@@ -91,7 +91,7 @@ export default function PricingPage() {
                   </div>
                 </button>
                 <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all hover:scale-105 ${
                     !isAnnual ? "bg-background shadow-sm" : ""
                   }`}
                   onClick={() => setIsAnnual(false)}
@@ -106,12 +106,11 @@ export default function PricingPage() {
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
-                className={`flex flex-col ${
-                  plan.popular ? "border-primary shadow-md relative" : ""
-                }`}
+                className={`flex flex-col rounded-2xl transition-all hover:scale-105 hover:shadow-xl
+                  ${plan.popular ? "border-0 ring-2 ring-fuchsia-500 shadow-2xl relative" : "border hover:border-fuchsia-300"}`}
               >
                 {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg animate-gradient">
                     MOST POPULAR
                   </div>
                 )}
@@ -151,7 +150,8 @@ export default function PricingPage() {
                 </CardContent>
                 <CardFooter>
                   <Button 
-                    className={`w-full ${plan.popular ? "bg-primary" : ""}`}
+                    className={`w-full text-lg font-bold py-6 rounded-full transition-all hover:scale-105
+                      ${plan.popular ? "text-white shadow-lg animate-gradient" : "hover:bg-fuchsia-50 hover:border-fuchsia-400 hover:text-fuchsia-600"}`}
                     variant={plan.popular ? "default" : "outline"}
                     onClick={handlePlanSelect}
                   >

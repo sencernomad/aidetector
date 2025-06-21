@@ -31,33 +31,36 @@ export default function Header() {
   return (
     <header className="border-b sticky top-0 bg-background z-50">
       <div className="container mx-auto py-4 px-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center gap-3">
           <Image 
-            src="/applogo.png"
+            src="/applogoo.png"
             alt="AI Scanner Logo"
             width={150}
             height={40}
             className="h-10 w-auto"
           />
+          <span className="text-xl font-bold bg-clip-text text-transparent animate-text-gradient">
+            AI Image or Not
+          </span>
         </Link>
         <nav className="hidden md:flex space-x-6">
-          <Link href="/" className="text-foreground font-medium">{t.header.nav.home}</Link>
-          <Link href="/scanner" className="text-muted-foreground hover:text-foreground transition">Scanner</Link>
-          <a href="#features" className="text-muted-foreground hover:text-foreground transition" onClick={e => handleNavClick(e, 'features')}>{t.header.nav.features}</a>
-          <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition" onClick={e => handleNavClick(e, 'testimonials')}>{t.header.nav.testimonials}</a>
-          <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition">{t.header.nav.pricing}</Link>
-          <a href="#faq" className="text-muted-foreground hover:text-foreground transition" onClick={e => handleNavClick(e, 'faq')}>{t.header.nav.faq}</a>
+          <Link href="/" className="text-foreground font-medium hover:text-fuchsia-600 transition-colors">{t.header.nav.home}</Link>
+          <Link href="/scanner" className="text-muted-foreground hover:text-fuchsia-600 transition-colors">Scanner</Link>
+          <a href="#faq" className="text-muted-foreground hover:text-fuchsia-600 transition-colors" onClick={e => handleNavClick(e, 'faq')}>{t.header.nav.faq}</a>
         </nav>
         <div className="flex items-center space-x-3">
           {isAuthenticated ? (
             <>
               <Link href="/profile">
-                <Button variant="outline" size="sm">My Profile</Button>
+                <Button variant="outline" size="sm" className="rounded-full hover:bg-fuchsia-50 hover:border-fuchsia-400 hover:text-fuchsia-600 transition-colors">My Profile</Button>
               </Link>
-              <Button size="sm" onClick={signOut}>{t.header.nav.logout}</Button>
+              <Button size="sm" onClick={signOut} className="rounded-full hover:scale-105 transition-transform">{t.header.nav.logout}</Button>
             </>
           ) : (
-            <Button size="sm" onClick={() => router.push('/login')}>{t.header.nav.login}</Button>
+            <Button size="sm" onClick={() => {
+              console.log('Login button clicked!');
+              router.push('/login');
+            }} className="rounded-full hover:scale-105 transition-transform">{t.header.nav.login}</Button>
           )}
         </div>
       </div>

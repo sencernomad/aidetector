@@ -186,7 +186,7 @@ export default function CreatePage() {
         <div className="text-center max-w-md w-full">
           <div className="mb-6">
             <Image 
-              src="/applogo.png"
+              src="/applogoo.png"
               alt="AI Scanner Logo"
               width={180}
               height={60}

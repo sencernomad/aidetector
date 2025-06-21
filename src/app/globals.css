@@ -121,6 +121,26 @@
   }
 }
 
+@layer components {
+  .animate-gradient {
+    background-size: 200% 200%;
+    background-image: linear-gradient(to right, #9333ea, #ec4899, #9333ea);
+    animation: gradient-flow 5s ease infinite;
+  }
+  
+  .animate-text-gradient {
+    background-size: 200% 200%;
+    background-image: linear-gradient(to right, #8b5cf6, #d946ef, #ec4899, #8b5cf6);
+    animation: gradient-flow 8s ease infinite;
+  }
+
+  @keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+
 @keyframes pulse-slow {
   0%, 100% {
     opacity: 0.7;

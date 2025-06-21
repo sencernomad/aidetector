@@ -90,7 +90,7 @@ export default function ProfilePage() {
           {user?.user_metadata?.avatar_url ? (
             <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name || user.user_metadata.name || user.email} />
           ) : null}
-          <AvatarFallback className="bg-gradient-to-br from-fuchsia-500 to-indigo-500 text-white text-3xl">
+          <AvatarFallback className="text-white text-3xl animate-text-gradient">
             {user?.user_metadata?.full_name?.[0] || user?.user_metadata?.name?.[0] || user?.email?.[0] || 'W'}
           </AvatarFallback>
         </Avatar>
@@ -115,7 +115,7 @@ export default function ProfilePage() {
             </span>
             )}
             {subscriptionStatus === 'Not subscribed yet' && (
-              <Button asChild size="sm" className="ml-2 bg-gradient-to-r from-fuchsia-600 to-indigo-500 text-white font-bold px-4 py-1 rounded-full shadow hover:scale-105 transition-all">
+              <Button asChild size="sm" className="ml-2 text-white font-bold px-4 py-1 rounded-full shadow hover:scale-105 transition-all animate-gradient">
                 <Link href="/pricing"><ArrowUpRight className="h-4 w-4 mr-1" /> Upgrade now</Link>
               </Button>
             )}
@@ -170,12 +170,14 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center text-center p-12 border rounded-2xl bg-muted/50 shadow-inner">
-            <ImageIcon className="h-16 w-16 mx-auto mb-4 text-fuchsia-400" />
+            <div className="p-4 bg-gradient-to-br from-fuchsia-100 to-indigo-100 rounded-full mb-4">
+                <ImageIcon className="h-16 w-16 text-fuchsia-600" />
+            </div>
             <h3 className="text-xl font-semibold mb-2">No images scanned yet</h3>
             <p className="text-muted-foreground mb-6">
               Upload your first image to see if it's AI-generated or real. Start exploring the power of AI detection!
             </p>
-            <Button asChild className="bg-gradient-to-r from-fuchsia-600 to-indigo-500 text-white font-bold px-6 py-3 rounded-full shadow hover:scale-105 transition-all">
+            <Button asChild className="text-white font-bold px-6 py-3 rounded-full shadow hover:scale-105 transition-all animate-gradient">
               <Link href="/scanner">Scan Image</Link>
             </Button>
           </div>
