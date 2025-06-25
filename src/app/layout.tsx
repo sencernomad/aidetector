@@ -12,6 +12,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'AI Image Detector',
   description: 'Detect if an image is AI-generated or real.',
+  icons: {
+    icon: '/applogoo.png',
+    shortcut: '/applogoo.png',
+    apple: '/applogoo.png',
+  },
 };
 
 export default function RootLayout({
