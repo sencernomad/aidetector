@@ -5,18 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ImageIcon, PercentIcon } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { getStripe } from "@/lib/stripe";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(true);
-  const { isAuthenticated, signOut } = useAuth();
+  const [loading, setLoading] = useState<string | null>(null);
   const router = useRouter();
+  
+  // Use the actual auth context
+  const { isAuthenticated, loading: authLoading } = useAuth();
   
   const plans = [
     {
       name: "Lite",
       description: "For occasional use and personal projects",
+      monthlyPriceId: 'price_1RfipSRv8iAshBPvyaGTiksE', // Lite Monthly - $8.99
+      annualPriceId: 'price_1RfipvRv8iAshBPv1zBvxuvV',  // Lite Yearly - $59.99
       price: {
         monthly: 8.99,
         annual: 4.99,
@@ -36,6 +42,8 @@ export default function PricingPage() {
     {
       name: "Pro",
       description: "For professionals and businesses",
+      monthlyPriceId: 'price_1RhqdbRkAhJhRPy1YWqEjit2', // Pro Monthly - $14.99
+      annualPriceId: 'price_1RfisoRv8iAshBPv1YWeEdPZ',   // Pro Yearly - $107.88
       price: {
         monthly: 14.99,
         annual: 8.99,
@@ -56,15 +64,61 @@ export default function PricingPage() {
     }
   ];
 
-  const handlePlanSelect = () => {
+  const handlePlanSelect = async (plan: typeof plans[0]) => {
+    // Check authentication status
     if (!isAuthenticated) {
       router.push('/login?from=/pricing');
-    } else {
-      // Handle subscription process for authenticated users
-      // You would implement Stripe or another payment processor here
-      alert('Subscription flow would start here for authenticated users');
+      return;
+    }
+
+    try {
+      setLoading(plan.name);
+      
+      const stripe = await getStripe();
+      if (!stripe) throw new Error('Stripe not loaded');
+
+      // Get the correct price ID based on billing interval
+      const priceId = isAnnual ? plan.annualPriceId : plan.monthlyPriceId;
+
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          priceId,
+          planType: plan.name,
+        }),
+      });
+
+      const { sessionId, error } = await response.json();
+      if (error) throw new Error(error);
+
+      // Redirect to Stripe Checkout
+      const result = await stripe.redirectToCheckout({
+        sessionId,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Sorry, there was an error processing your request. Please try again.');
+    } finally {
+      setLoading(null);
     }
   };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+        <span className="ml-2">Loading...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -153,9 +207,10 @@ export default function PricingPage() {
                     className={`w-full text-lg font-bold py-6 rounded-full transition-all hover:scale-105
                       ${plan.popular ? "text-white shadow-lg animate-gradient" : "hover:bg-fuchsia-50 hover:border-fuchsia-400 hover:text-fuchsia-600"}`}
                     variant={plan.popular ? "default" : "outline"}
-                    onClick={handlePlanSelect}
+                    onClick={() => handlePlanSelect(plan)}
+                    disabled={loading === plan.name}
                   >
-                    {plan.cta}
+                    {loading === plan.name ? 'Processing...' : plan.cta}
                   </Button>
                 </CardFooter>
               </Card>

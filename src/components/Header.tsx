@@ -9,9 +9,12 @@ import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header() {
   const t = useTranslations();
-  const { isAuthenticated, signOut } = useAuth();
+  const { isAuthenticated, signOut, user, loading } = useAuth();
   const router = useRouter();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+  // Debug logging
+  console.log('Header - Auth state:', { isAuthenticated, user: user?.email, loading });
 
   // Helper to handle anchor navigation
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
@@ -46,10 +49,13 @@ export default function Header() {
         <nav className="hidden md:flex space-x-6">
           <Link href="/" className="text-foreground font-medium hover:text-fuchsia-600 transition-colors">{t.header.nav.home}</Link>
           <Link href="/scanner" className="text-muted-foreground hover:text-fuchsia-600 transition-colors">Scanner</Link>
+          <Link href="/pricing" className="text-muted-foreground hover:text-fuchsia-600 transition-colors">Pricing</Link>
           <a href="#faq" className="text-muted-foreground hover:text-fuchsia-600 transition-colors" onClick={e => handleNavClick(e, 'faq')}>{t.header.nav.faq}</a>
         </nav>
         <div className="flex items-center space-x-3">
-          {isAuthenticated ? (
+          {loading ? (
+            <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+          ) : isAuthenticated ? (
             <>
               <Link href="/profile">
                 <Button variant="outline" size="sm" className="rounded-full hover:bg-fuchsia-50 hover:border-fuchsia-400 hover:text-fuchsia-600 transition-colors">My Profile</Button>

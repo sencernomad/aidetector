@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, signInWithGoogle, signOut as supabaseSignOut, getCurrentUser } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
@@ -29,11 +29,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       setLoading(true);
+      
+      // Set a timeout to prevent infinite loading
+      const timeout = setTimeout(() => {
+        console.log('Auth initialization timeout, setting loading to false');
+        setLoading(false);
+        setIsAuthenticated(false);
+        setSession(null);
+        setUser(null);
+      }, 5000); // 5 second timeout
+
       try {
-        // Get current session
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        // Simple session check with timeout
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout')), 3000)
+        );
         
-        if (currentSession) {
+        const { data: { session: currentSession }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
+        
+        clearTimeout(timeout);
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          setSession(null);
+          setUser(null);
+          setIsAuthenticated(false);
+        } else if (currentSession) {
           setSession(currentSession);
           setUser(currentSession.user);
           setIsAuthenticated(true);
@@ -45,7 +70,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAuthenticated(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        clearTimeout(timeout);
+        console.error('Error initializing auth (using fallback):', error);
         setSession(null);
         setUser(null);
         setIsAuthenticated(false);
@@ -56,59 +82,72 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initializeAuth();
 
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        console.log('Auth state change event:', event);
-        
-        if (event === 'SIGNED_IN' && newSession) {
-          console.log('User signed in:', newSession.user.email);
-          setSession(newSession);
-          setUser(newSession.user);
-          setIsAuthenticated(true);
-        } 
-        else if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
-          setSession(null);
-          setUser(null);
-          setIsAuthenticated(false);
+    // Simplified auth listener with error handling
+    let subscription: any = null;
+
+    try {
+      const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
+        async (event, newSession) => {
+          console.log('Auth state change event:', event);
+          
+          if (event === 'SIGNED_IN' && newSession) {
+            console.log('User signed in:', newSession.user.email);
+            setSession(newSession);
+            setUser(newSession.user);
+            setIsAuthenticated(true);
+            setLoading(false);
+          } 
+          else if (event === 'SIGNED_OUT') {
+            console.log('User signed out');
+            setSession(null);
+            setUser(null);
+            setIsAuthenticated(false);
+            setLoading(false);
+          }
+          else if (event === 'TOKEN_REFRESHED' && newSession) {
+            console.log('Token refreshed for:', newSession.user.email);
+            setSession(newSession);
+            setUser(newSession.user);
+            setIsAuthenticated(true);
+            setLoading(false);
+          }
         }
-        else if (event === 'USER_UPDATED' && newSession) {
-          console.log('User updated:', newSession.user.email);
-          setSession(newSession);
-          setUser(newSession.user);
-          setIsAuthenticated(true);
-        }
-        else if (event === 'TOKEN_REFRESHED' && newSession) {
-          console.log('Token refreshed for:', newSession.user.email);
-          setSession(newSession);
-          setUser(newSession.user);
-          setIsAuthenticated(true);
-        }
-        
-        setLoading(false);
-      }
-    );
+      );
+      
+      subscription = authSubscription;
+    } catch (error) {
+      console.error('Error setting up auth listener:', error);
+      setLoading(false);
+    }
 
     // Clean up subscription on unmount
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        try {
+          subscription.unsubscribe();
+        } catch (error) {
+          console.error('Error unsubscribing:', error);
+        }
+      }
     };
   }, []);
 
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
+      // Make sure we use localhost for development
+      const redirectTo = `http://localhost:3000/auth/callback`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectTo,
         },
       });
       if (error) throw error;
     } catch (error) {
       console.error('Error signing in with Google:', error);
-      // You might want to show a notification to the user
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -119,10 +158,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      // On successful sign-in, onAuthStateChange will trigger and handle the session
     } catch (error) {
       console.error('Error signing in with password:', error);
-      throw error; // Re-throw to be caught in the UI
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -139,12 +177,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       });
       if (error) throw error;
-      // On successful sign-up, onAuthStateChange will trigger if email confirmation is off.
-      // If email confirmation is on, the user will be in a pending state.
-      // You might want to show a "Check your email" message here.
     } catch (error) {
       console.error('Error signing up:', error);
-      throw error; // Re-throw to be caught in the UI
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -155,7 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      router.push('/'); // Redirect to home page after sign out
+      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
     } finally {
