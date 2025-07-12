@@ -5,6 +5,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import { Toaster } from 'sonner';
 import Link from 'next/link';
+import Script from 'next/script';
+import ClarityAnalytics from '@/components/ClarityAnalytics';
 // import { ClientAuthCheck } from '@/components/ClientAuthCheck';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -27,6 +29,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.className} flex flex-col h-full`}>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17342336520"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-17342336520');
+          `}
+        </Script>
+
+        {/* Microsoft Clarity */}
+        <ClarityAnalytics />
+
         <AuthProvider>
           <Header />
           {/* <ClientAuthCheck> */}
