@@ -11,7 +11,7 @@ declare global {
 
 export default function ClarityAnalytics() {
   // Microsoft Clarity Project ID - Replace with your actual project ID
-  const clarityProjectId = "sdnfctooy2";
+  const clarityProjectId = "abc123def456"; // Gerçek Project ID buraya
   
   useEffect(() => {
     // Initialize Clarity when component mounts
