@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     try {
-      // Use environment variables for Supabase configuration
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      // Use environment variables with fallback for build-time compatibility
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key';
       
-      if (!supabaseUrl || !supabaseAnonKey) {
+      if (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder_key') {
         console.error('Missing Supabase environment variables in auth callback');
         return NextResponse.redirect(new URL('/', requestUrl.origin));
       }

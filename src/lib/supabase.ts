@@ -1,19 +1,21 @@
 "use client";
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Use environment variables for production
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Build-time safe Supabase client
+function createSupabaseClient() {
+  // Use environment variables for production
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key';
 
-console.log('Supabase config:', { supabaseUrl, supabaseAnonKey: supabaseAnonKey ? 'EXISTS' : 'MISSING' });
+  console.log('Supabase config:', { supabaseUrl, supabaseAnonKey: supabaseAnonKey !== 'placeholder_key' ? 'EXISTS' : 'MISSING' });
 
-// Ensure we have the required environment variables
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables');
+  // Create client even with placeholder values for build-time compatibility
+  return createClient(supabaseUrl, supabaseAnonKey);
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Export Supabase client
+export const supabase = createSupabaseClient();
 
 export const signInWithGoogle = async () => {
   const currentPath = window.location.pathname;

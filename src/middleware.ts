@@ -4,13 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 
 // This middleware checks authentication before redirecting
 export async function middleware(request: NextRequest) {
-  // Create a Supabase client using environment variables
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  // Create a Supabase client with fallback values for build-time compatibility
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key';
   
-  // Skip Supabase operations if environment variables are not available
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase environment variables not found in middleware');
+  // Skip Supabase operations if using placeholder values
+  if (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder_key') {
+    console.warn('Supabase environment variables not found in middleware, skipping auth check');
     return NextResponse.next();
   }
   
