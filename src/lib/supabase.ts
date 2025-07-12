@@ -2,11 +2,16 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Hardcode values for now to fix the config.authenticator error
-const supabaseUrl = 'https://uzpwlzdhziiybzbdnasq.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6cHdsemRoemlpeWJ6YmRuYXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1NjI3OTcsImV4cCI6MjA2MzEzODc5N30.izoU9FesSnPMehNbIa_7cdRuXGwb6RuujF52k1Sa_Z4';
+// Use environment variables for production
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 console.log('Supabase config:', { supabaseUrl, supabaseAnonKey: supabaseAnonKey ? 'EXISTS' : 'MISSING' });
+
+// Ensure we have the required environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 

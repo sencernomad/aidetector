@@ -4,9 +4,16 @@ import { createClient } from '@supabase/supabase-js';
 
 // This middleware checks authentication before redirecting
 export async function middleware(request: NextRequest) {
-  // Create a Supabase client with the same hardcoded values
-  const supabaseUrl = 'https://uzpwlzdhziiybzbdnasq.supabase.co';
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6cHdsemRoemlpeWJ6YmRuYXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1NjI3OTcsImV4cCI6MjA2MzEzODc5N30.izoU9FesSnPMehNbIa_7cdRuXGwb6RuujF52k1Sa_Z4';
+  // Create a Supabase client using environment variables
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  
+  // Skip Supabase operations if environment variables are not available
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase environment variables not found in middleware');
+    return NextResponse.next();
+  }
+  
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   // Check if we're trying to access a protected route
