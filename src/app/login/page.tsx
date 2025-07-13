@@ -102,25 +102,16 @@ function LoginPageContent() {
     );
   }
 
+  const from = searchParams.get('from') || '/profile';
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = from;
+    }
+  }, [isAuthenticated, from]);
+
   return (
     <>
-        {isAuthenticated ? (
-          <div className="text-center p-8 max-w-md w-full bg-white rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold text-green-600 mb-4">Successfully Signed In!</h2>
-            <p className="text-muted-foreground mb-6">Welcome back. Choose where you want to go:</p>
-            <div className="space-y-3">
-              <Button onClick={() => window.location.href = '/scanner'} className="w-full">
-                Scan a New Image
-              </Button>
-              <Button onClick={() => window.location.href = '/profile'} variant="outline" className="w-full">
-                View My Profile
-              </Button>
-              <Button onClick={() => window.location.href = '/'} variant="ghost" className="w-full">
-                Go to Homepage
-              </Button>
-            </div>
-          </div>
-        ) : (
+        {isAuthenticated ? null : (
           <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg animate-fade-in">
             <div className="text-center">
               <Link href="/" className="inline-block mb-6">

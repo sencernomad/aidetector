@@ -154,7 +154,7 @@ export default function ScannerPage() {
     // 1. Check for free scan
     const freeScanUsed = await hasUsedFreeScan();
     if (freeScanUsed) {
-      router.push('/login?reason=no_credits');
+      router.push('/login?reason=no_credits&from=/scanner');
       return;
     }
 
