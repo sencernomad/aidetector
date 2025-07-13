@@ -40,6 +40,7 @@ export default function ScannerPage() {
   const { user, isAuthenticated, loading, signOut } = useAuth();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [guestId, setGuestId] = useState('');
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     setGuestId(getGuestId());
@@ -154,7 +155,7 @@ export default function ScannerPage() {
     // 1. Check for free scan
     const freeScanUsed = await hasUsedFreeScan();
     if (freeScanUsed) {
-      router.push('/login?reason=no_credits&from=/scanner');
+      setShowLoginModal(true);
       return;
     }
 
@@ -499,6 +500,27 @@ export default function ScannerPage() {
             <div className="mt-8 flex justify-center">
               <Button onClick={() => router.push('/pricing')} className="bg-gradient-to-r from-fuchsia-600 to-purple-500 text-white font-bold px-10 py-4 rounded-full text-xl shadow-lg flex items-center gap-2 hover:scale-105 transition-all">
                 <span role="img" aria-label="lock">🔒</span> Upgrade Now
+              </Button>
+            </div>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Login Required Modal */}
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent className="relative overflow-hidden">
+          <DialogHeader className="relative z-10">
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+              <span role="img" aria-label="lock">🔒</span> Sign In Required
+            </DialogTitle>
+            <DialogDescription className="mt-4 text-lg text-gray-800 font-medium">
+              You have used your free image analysis quota.<br />
+              <span className="font-bold text-fuchsia-700">Sign in</span> to continue scanning images and unlock unlimited access.<br />
+              <span className="block mt-4 text-base text-gray-700">Signing in lets you track your scans and access more features.</span>
+            </DialogDescription>
+            <div className="mt-8 flex flex-col gap-4 items-center">
+              <Button onClick={() => router.push('/login?reason=no_credits&from=/scanner')} className="bg-gradient-to-r from-fuchsia-600 to-purple-500 text-white font-bold px-10 py-4 rounded-full text-xl shadow-lg flex items-center gap-2 hover:scale-105 transition-all">
+                <span role="img" aria-label="lock">🔒</span> Sign In
               </Button>
             </div>
           </DialogHeader>
