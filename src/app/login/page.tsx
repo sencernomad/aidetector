@@ -14,7 +14,7 @@ import { Image as ImageIcon } from 'lucide-react';
 function LoginPageContent() {
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason');
-  
+  const from = searchParams.get('from') || '/profile';
   const { signInWithGoogle, signInWithPassword, signUp, isAuthenticated, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,6 +37,12 @@ function LoginPageContent() {
   useEffect(() => {
     if (!loading) setInitialLoading(false);
   }, [loading]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = from;
+    }
+  }, [isAuthenticated, from]);
 
   const handleAuthAction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,13 +107,6 @@ function LoginPageContent() {
       </div>
     );
   }
-
-  const from = searchParams.get('from') || '/profile';
-  useEffect(() => {
-    if (isAuthenticated) {
-      window.location.href = from;
-    }
-  }, [isAuthenticated, from]);
 
   return (
     <>
