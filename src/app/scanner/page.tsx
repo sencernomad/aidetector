@@ -155,7 +155,11 @@ export default function ScannerPage() {
     // 1. Check for free scan
     const freeScanUsed = await hasUsedFreeScan();
     if (freeScanUsed) {
-      setShowLoginModal(true);
+      if (isAuthenticated) {
+        setShowUpgradeModal(true);
+      } else {
+        setShowLoginModal(true);
+      }
       return;
     }
 
@@ -481,34 +485,37 @@ export default function ScannerPage() {
         </div>
       </footer>
 
-      {/* Upgrade Modal */}
+      {/* Upgrade Modal (for authenticated users) */}
       <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
         <DialogContent className="relative overflow-hidden">
-          {/* Blurred AI image background */}
+          {/* Blurred background image */}
           <div className="absolute inset-0 z-0">
-            <img src="/esmer-ai.webp" alt="AI Example" className="w-full h-full object-cover blur-lg opacity-20" />
+            <img src="/esmer-ai.webp" alt="Blurred background" className="w-full h-full object-cover blur-lg opacity-30" />
           </div>
           <DialogHeader className="relative z-10">
             <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
-              <span role="img" aria-label="lock">🔒</span> Your Free Trial Has Ended
+              <span role="img" aria-label="lock">🔒</span> Upgrade Required
             </DialogTitle>
             <DialogDescription className="mt-4 text-lg text-gray-800 font-medium">
-              You've used your free image analysis quota.<br />
-              <span className="font-bold text-fuchsia-700">Upgrade now</span> to continue detecting AI-generated images instantly, <span className="font-bold">without limits</span>.<br />
-              <span className="block mt-4 text-base text-gray-700">💡 Pro users get <span className="font-semibold text-fuchsia-700">priority scanning</span>, detailed analysis reports, and unlimited access.</span>
+              You have used your free image analysis quota.<br />
+              <span className="font-bold text-fuchsia-700">Please upgrade your plan</span> to continue scanning images without limits.<br />
+              <span className="block mt-4 text-base text-gray-700">Pro users get unlimited scans, detailed reports, and priority support.</span>
             </DialogDescription>
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex flex-col gap-4 items-center">
               <Button onClick={() => router.push('/pricing')} className="bg-gradient-to-r from-fuchsia-600 to-purple-500 text-white font-bold px-10 py-4 rounded-full text-xl shadow-lg flex items-center gap-2 hover:scale-105 transition-all">
-                <span role="img" aria-label="lock">🔒</span> Upgrade Now
+                <span role="img" aria-label="lock">🔒</span> Upgrade
               </Button>
             </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
-
-      {/* Login Required Modal */}
+      {/* Login Required Modal (for unauthenticated users) */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
         <DialogContent className="relative overflow-hidden">
+          {/* Blurred background image */}
+          <div className="absolute inset-0 z-0">
+            <img src="/esmer-ai.webp" alt="Blurred background" className="w-full h-full object-cover blur-lg opacity-30" />
+          </div>
           <DialogHeader className="relative z-10">
             <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
               <span role="img" aria-label="lock">🔒</span> Sign In Required
